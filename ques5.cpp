@@ -1,23 +1,51 @@
-// Question Link : https://leetcode.com/problems/dungeon-game/
+// Question Link: https://leetcode.com/problems/palindrome-partitioning-ii/
 
-// Level : Hard 
+// level : medium
+
 
 class Solution {
 public:
-     int calculateMinimumHP(vector<vector<int> > &dungeon) {
-        int M = dungeon.size();
-        int N = dungeon[0].size();
-        // hp[i][j] represents the min hp needed at position (i, j)
-        // Add dummy row and column at bottom and right side
-        vector<vector<int> > hp(M + 1, vector<int>(N + 1, INT_MAX));
-        hp[M][N - 1] = 1;
-        hp[M - 1][N] = 1;
-        for (int i = M - 1; i >= 0; i--) {
-            for (int j = N - 1; j >= 0; j--) {
-                int need = min(hp[i + 1][j], hp[i][j + 1]) - dungeon[i][j];
-                hp[i][j] = need <= 0 ? 1 : need;
+    bool isPalindrome (string & s, int i, int j){
+        while(i<j){
+            if(s[i]!=s[j]) return false;
+            i++; j--;
+        }
+        return true;
+    }
+    
+
+    int solve (string & s, int i, int j, vector<vector<int>> & dp){    
+        
+        if(i>=j or isPalindrome(s, i, j)) return 0;
+        
+        if(dp[i][j]!=-1) return dp[i][j];
+        
+        int ans = INT_MAX;
+        
+        for(int k=i; k<j; k++){
+            
+            /* 
+                Instead of writing below standard line
+                We will recurse for only right part
+                Only when left part turns out to be palindrome
+                
+                int temp =  solve (s, i, k, dp, palindrome) + solve (s, k+1, j, dp, palindrome) + 1;
+                
+            */
+            
+            if(isPalindrome(s, i, k)){                         
+                int temp = solve (s, k+1, j, dp) + 1;
+                ans = min (ans, temp);
             }
         }
-        return hp[0][0];
+        
+        return dp[i][j] = ans;
+    }
+    
+    int minCut(string s) {
+        int n = s.length();
+        vector<vector<int>> dp (n+1, vector<int> (n+1, -1));
+            
+        return solve (s, 0, n-1, dp);
     }
 };
